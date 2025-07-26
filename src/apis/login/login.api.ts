@@ -4,7 +4,7 @@ import {Login, NewAccessTokenResponse} from "src/types/login/login.type";
 const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL;
 
 export const loginApi = async (login: Login) => {
-    const {data} = await axios.post(`${SERVER_URL}/login`, login);
+    const {data} = await axios.post(`${SERVER_URL}/auth/login`, login);
     return data;
 }
 
