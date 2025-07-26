@@ -1,13 +1,42 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import {
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    TouchableOpacity,
+} from "react-native";
 import Logo from "../../assets/images/logo.png";
-const Header = (title?: String) => {
+import { useIsModalOpenStore } from "src/store/isModalOpenStore";
+
+interface HeaderProps {
+    title?: string;
+}
+
+const Header = ({ title }: HeaderProps) => {
+    const { setModalOpen } = useIsModalOpenStore();
     return (
         <SafeAreaView style={styles.container}>
-            <View>
+            <View style={styles.wrapper}>
                 {title ? (
-                    <Text style={styles.title}>title</Text>
+                    <>
+                        <Text style={styles.title}>{title}</Text>
+                        {title === "도감" ? (
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => setModalOpen(true)}
+                            >
+                                <Text style={styles.buttonText}>도감 등록</Text>
+                            </TouchableOpacity>
+                        ) : title === "기록" ? (
+                            <TouchableOpacity style={styles.button}>
+                                <Text style={styles.buttonText}>기록 등록</Text>
+                            </TouchableOpacity>
+                        ) : null}
+                    </>
                 ) : (
-                    <Logo
+                    <Image
                         source={Logo}
                         style={styles.logo}
                         resizeMode="contain"
@@ -21,21 +50,34 @@ const Header = (title?: String) => {
 const styles = StyleSheet.create({
     container: {
         width: "100%",
-        flex: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
     },
     logo: {
         width: 50,
         height: 50,
     },
-    mainWrapper: {
-        width: "100%",
-        paddingHorizontal: 20,
-        paddingVertical: 25,
-    },
     title: {
         fontSize: 24,
-        fontWeight: 600,
+        fontWeight: "600",
         color: "#222222",
+    },
+    wrapper: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    button: {
+        backgroundColor: "#222",
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+    },
+    buttonText: {
+        fontSize: 12,
+        color: "#ffffff",
+        fontWeight: "600",
     },
 });
 
