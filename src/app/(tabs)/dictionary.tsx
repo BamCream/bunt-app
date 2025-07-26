@@ -4,41 +4,53 @@ import {
     StyleSheet,
     View,
     Text,
-    Pressable,
     Image,
     FlatList,
+    RefreshControl, // ✅ 추가
 } from "react-native";
 import Lock from "../../assets/images/lock.png";
 import Unlock from "../../assets/images/unlock.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Header from "src/components/common/header";
 import CodeInputModal from "src/components/common/modal/modal";
 import { DicProps } from "src/types/DicType";
 import BuntAxios from "src/libs/axios";
 
 const DictionaryScreen = () => {
-    const post = async () => {
+    const [items, setItems] = useState<DicProps[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const fetchDict = async () => {
         try {
             const res = await BuntAxios("/dict");
             setItems(res.data);
         } catch (error) {
-            throw error;
+            console.error(error);
         }
     };
 
-    useEffect(() => {
-        post();
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await fetchDict();
+        setRefreshing(false);
     }, []);
 
-    const [items, setItems] = useState<DicProps[]>([]);
-
-    const handleSubmitCode = (code: string) => {
-        console.log("입력한 코드:", code);
-    };
+    useEffect(() => {
+        fetchDict();
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView style={styles.mainWrapper}>
+            <ScrollView
+                style={styles.mainWrapper}
+                refreshControl={
+                    // ✅ 당겨서 새로고침 추가
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            >
                 <Header title="도감" />
                 <View style={styles.section}>
                     <View style={styles.filterRow}>
@@ -65,18 +77,10 @@ const DictionaryScreen = () => {
                                     {item.productName}
                                 </Text>
 
-                                <View style={{ height: 16 }} />
+                                <View style={{ height: 12 }} />
 
-                                {/* 자물쇠 아이콘 */}
                                 {item.isUnlocked === "LOCKED" && (
-                                    <View
-                                        style={{
-                                            display: "flex",
-                                            flexDirection: "row",
-                                            alignItems: "center",
-                                            gap: 4,
-                                        }}
-                                    >
+                                    <View style={styles.lockedWrapper}>
                                         <Image
                                             source={Lock}
                                             style={styles.icon}
@@ -87,7 +91,7 @@ const DictionaryScreen = () => {
                                     </View>
                                 )}
                                 {item.isUnlocked === "UNLOCKED" && (
-                                    <>
+                                    <View style={styles.lockedWrapper}>
                                         <Image
                                             source={Unlock}
                                             style={styles.icon}
@@ -95,7 +99,7 @@ const DictionaryScreen = () => {
                                         <Text style={styles.statusText}>
                                             획득하였습니다
                                         </Text>
-                                    </>
+                                    </View>
                                 )}
                             </View>
                         )}
@@ -103,7 +107,7 @@ const DictionaryScreen = () => {
                     />
                 </View>
             </ScrollView>
-            <CodeInputModal onSubmit={handleSubmitCode} />
+            <CodeInputModal />
         </SafeAreaView>
     );
 };
@@ -202,6 +206,11 @@ const styles = StyleSheet.create({
     gridRow: {
         justifyContent: "space-between",
         marginTop: 12,
+    },
+    lockedWrapper: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
     },
     card: {
         width: "30%",
