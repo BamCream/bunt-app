@@ -1,8 +1,15 @@
-import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    Pressable,
+    FlatList,
+    Image,
+} from "react-native";
 import { useState } from "react";
+import { TEAMS } from "src/constants/team";
 
 const CATEGORIES = ["모자", "유니폼", "기타"];
-const TEAMS = ["삼성 라이온즈", "LG 트윈스", "기아 타이거즈"];
 
 const DUMMY_ITEMS = Array.from({ length: 6 }, (_, i) => ({
     id: i.toString(),
@@ -14,6 +21,7 @@ const DUMMY_ITEMS = Array.from({ length: 6 }, (_, i) => ({
 const Stat = () => {
     const [selectedCategory, setSelectedCategory] = useState("모자");
     const [selectedTeam, setSelectedTeam] = useState("삼성 라이온즈");
+    const [teamDropdownVisible, setTeamDropdownVisible] = useState(false);
 
     return (
         <View style={styles.container}>
@@ -23,7 +31,12 @@ const Stat = () => {
                 {["경기", "승", "무", "패", "승률"].map((label, index) => (
                     <View style={styles.statItem} key={label}>
                         <Text style={styles.statLabel}>{label}</Text>
-                        <Text style={[styles.statValue, index === 4 && styles.redText]}>
+                        <Text
+                            style={[
+                                styles.statValue,
+                                index === 4 && styles.redText,
+                            ]}
+                        >
                             {index === 4 ? "100%" : "20"}
                         </Text>
                     </View>
@@ -42,17 +55,53 @@ const Stat = () => {
                                 onPress={() => setSelectedCategory(cat)}
                                 style={[
                                     styles.filterButton,
-                                    active ? styles.activeFilter : styles.inactiveFilter,
+                                    active
+                                        ? styles.activeFilter
+                                        : styles.inactiveFilter,
                                 ]}
                             >
-                                <Text style={active ? styles.activeFilterText : styles.inactiveFilterText}>
+                                <Text
+                                    style={
+                                        active
+                                            ? styles.activeFilterText
+                                            : styles.inactiveFilterText
+                                    }
+                                >
                                     {cat}
                                 </Text>
                             </Pressable>
                         );
                     })}
                 </View>
-                <Text style={styles.dropdown}>{selectedTeam} ⌄</Text>
+
+                <View style={{ position: "relative" }}>
+                    <Pressable
+                        onPress={() =>
+                            setTeamDropdownVisible(!teamDropdownVisible)
+                        }
+                    >
+                        <Text style={styles.dropdown}>{selectedTeam} ⌄</Text>
+                    </Pressable>
+
+                    {teamDropdownVisible && (
+                        <View style={styles.dropdownBox}>
+                            {TEAMS.map((team) => (
+                                <Pressable
+                                    key={team}
+                                    onPress={() => {
+                                        setSelectedTeam(team);
+                                        setTeamDropdownVisible(false);
+                                    }}
+                                    style={styles.dropdownItem}
+                                >
+                                    <Text style={styles.dropdownItemText}>
+                                        {team}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    )}
+                </View>
             </View>
 
             <FlatList
@@ -141,6 +190,35 @@ const styles = StyleSheet.create({
     dropdown: {
         fontSize: 14,
         fontWeight: "500",
+        color: "#000",
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderWidth: 1,
+        borderColor: "#000",
+        borderRadius: 8,
+        backgroundColor: "#fff",
+    },
+    dropdownBox: {
+        position: "absolute",
+        top: "100%",
+        left: 0,
+        width: 150,
+        backgroundColor: "#fff",
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 6,
+        marginTop: 4,
+        zIndex: 1000,
+        maxHeight: 300,
+    },
+    dropdownItem: {
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: "#eee",
+    },
+    dropdownItemText: {
+        fontSize: 14,
         color: "#000",
     },
     gridRow: {
