@@ -7,13 +7,10 @@ import {
     View,
     Modal as RNModal,
 } from "react-native";
+import BuntAxios from "src/libs/axios";
 import { useIsModalOpenStore } from "src/store/isModalOpenStore";
 
-interface CodeInputModalProps {
-    onSubmit: (code: string) => void;
-}
-
-const CodeInputModal = ({ onSubmit }: CodeInputModalProps) => {
+const CodeInputModal = () => {
     const [code, setCode] = React.useState("");
     const { setModalOpen, modalOpen } = useIsModalOpenStore();
 
@@ -55,9 +52,26 @@ const CodeInputModal = ({ onSubmit }: CodeInputModalProps) => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.button, styles.submitButton]}
-                                    onPress={() => {
-                                        onSubmit(code);
-                                        setCode("");
+                                    onPress={async () => {
+                                        try {
+                                            const dictId = parseInt(code, 10);
+                                            if (isNaN(dictId)) {
+                                                alert(
+                                                    "숫자 ID를 입력해주세요."
+                                                );
+                                                return;
+                                            }
+
+                                            await BuntAxios.put("/dict", {
+                                                dictId,
+                                            });
+                                            alert("등록 완료");
+                                            setModalOpen(false);
+                                            setCode("");
+                                        } catch (error) {
+                                            alert("등록에 실패했습니다.");
+                                            console.error(error);
+                                        }
                                     }}
                                 >
                                     <Text

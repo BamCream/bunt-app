@@ -1,33 +1,36 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import { PostProps } from "./type";
 
-const Post = ({
-    profileImg,
-    profileName,
-    post,
-    description,
-    title,
-    tags,
-    date,
-}: PostProps) => {
-    <View style={styles.container}>
-        <View style={styles.profileWrap}>
-            <Image style={styles.profile} source={{ uri: profileImg }} />
-            <Text style={styles.name}>{profileName}</Text>
-            <Image style={styles.post} source={{ uri: post }} />
+const Post = ({ ...post }: PostProps) => {
+    return (
+        <View style={styles.container}>
+            <View style={styles.profileWrap}>
+                <View
+                    style={{
+                        width: 30,
+                        height: 30,
+                        backgroundColor: "#222222",
+                        borderRadius: 999,
+                    }}
+                />
+                <Text style={styles.name}>박상민</Text>
+            </View>
+            <Image style={styles.post} source={{ uri: post.imageUrl }} />
             <View style={styles.infoWrap}>
-                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.title}>{post.title}</Text>
                 <View style={styles.tagWrap}>
-                    <Text style={styles.tags}>{description}</Text>
-                    {tags.map((_, item) => (
-                        <Text># {tags[item]} </Text>
+                    <Text style={styles.description}>{post.content} </Text>
+                    {post.tags.map((item, index) => (
+                        <Text key={index} style={styles.tags}>
+                            # {item[index]}{" "}
+                        </Text>
                     ))}
-                    <View style={{ height: 8 }} />
-                    <Text style={styles.date}>{date}</Text>
                 </View>
+                <View style={{ height: 16 }} />
+                <Text style={styles.date}>{post.createdAt.slice(0, 10)}</Text>
             </View>
         </View>
-    </View>;
+    );
 };
 
 const styles = StyleSheet.create({
@@ -40,6 +43,7 @@ const styles = StyleSheet.create({
     profileWrap: {
         gap: 8,
         display: "flex",
+        alignItems: "center",
         flexDirection: "row",
     },
     profile: {
@@ -63,16 +67,17 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     title: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: 600,
         color: "#222222",
     },
     tagWrap: {
         display: "flex",
         flexDirection: "row",
+        alignItems: "center",
     },
     description: {
-        fontSize: 12,
+        fontSize: 16,
         fontWeight: 400,
         color: "#222222",
     },
