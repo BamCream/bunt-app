@@ -1,4 +1,12 @@
-import { SafeAreaView, ScrollView, StyleSheet, Image, View, Text, Pressable } from "react-native";
+import {
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Image,
+    View,
+    Text,
+    Pressable,
+} from "react-native";
 import { useState } from "react";
 import ProfileIcon from "src/assets/images/profileIcon.png";
 import Header from "src/components/common/header";
@@ -13,7 +21,11 @@ const Profile = () => {
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Header title="프로필" />
                 <View style={styles.profileSection}>
-                    <Image source={ProfileIcon} style={styles.profileImage} resizeMode="cover" />
+                    <Image
+                        source={ProfileIcon}
+                        style={styles.profileImage}
+                        resizeMode="cover"
+                    />
                     <View style={styles.info}>
                         <Text style={styles.username}>박상민</Text>
                         <Text style={styles.tag}># 삼성라이온즈</Text>
@@ -26,10 +38,23 @@ const Profile = () => {
                         return (
                             <Pressable
                                 key={tab}
-                                onPress={() => setActiveTab(tab as "post" | "stat")}
-                                style={[styles.tabButton, isActive ? styles.activeTab : styles.inactiveTab]}
+                                onPress={() =>
+                                    setActiveTab(tab as "post" | "stat")
+                                }
+                                style={[
+                                    styles.tabButton,
+                                    isActive
+                                        ? styles.activeTab
+                                        : styles.inactiveTab,
+                                ]}
                             >
-                                <Text style={isActive ? styles.activeText : styles.inactiveText}>
+                                <Text
+                                    style={
+                                        isActive
+                                            ? styles.activeText
+                                            : styles.inactiveText
+                                    }
+                                >
                                     {tab === "post" ? "게시물" : "스탯"}
                                 </Text>
                             </Pressable>

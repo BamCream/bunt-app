@@ -1,9 +1,12 @@
 import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import Header from "src/components/common/header";
 
 const UploadScreen = () => {
     return (
         <SafeAreaView>
-            <ScrollView style={styles.mainWrapper}></ScrollView>
+            <ScrollView style={styles.mainWrapper}>
+                <Header title="게시물 업로드" />
+            </ScrollView>
         </SafeAreaView>
     );
 };

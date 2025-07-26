@@ -1,17 +1,12 @@
-import {
-    SafeAreaView,
-    Image,
-    StyleSheet,
-    View,
-    ScrollView,
-} from "react-native";
-import Logo from "../../assets/images/logo.png";
+import React from "react";
+import { SafeAreaView, StyleSheet, View, ScrollView } from "react-native";
+import Header from "src/components/common/header";
 
 const HomeScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.mainWrapper}>
-                <Image source={Logo} style={styles.logo} resizeMode="contain" />
+                <Header />
             </ScrollView>
             <View style={{ height: 40 }} />
         </SafeAreaView>
@@ -23,13 +18,9 @@ const styles = StyleSheet.create({
         width: "100%",
         flex: 1,
     },
-    logo: {
-        width: 50,
-        height: 50,
-    },
     mainWrapper: {
         width: "100%",
-        paddingHorizontal: 30,
+        paddingHorizontal: 20,
     },
 });
 
