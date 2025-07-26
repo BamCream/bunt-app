@@ -1,5 +1,5 @@
 {
-  "name": "bunt-app",
+  "name": "Bunt",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -28,7 +28,6 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-web": "~0.20.0",
     "zustand": "^5.0.6"
-    "react-native-safe-area-context": "5.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
