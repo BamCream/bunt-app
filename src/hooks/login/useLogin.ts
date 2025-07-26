@@ -29,7 +29,6 @@ const useLogin = () => {
             await Token.setToken(ACCESS_TOKEN, accessToken);
             await Token.setToken(REFRESH_TOKEN, refreshToken);
 
-            showToast("success", "로그인 성공");
             router.replace("/(tabs)/home");
         } catch (e) {
             console.log("로그인 에러:", e);
