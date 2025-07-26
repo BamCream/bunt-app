@@ -21,7 +21,6 @@ const Profile = () => {
             <ScrollView
                 contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
             >
-            <ScrollView contentContainerStyle={[styles.scrollContent, {flexGrow: 1}]}>
                 <Header title="프로필" />
                 <View style={styles.profileSection}>
                     <Image
@@ -80,13 +79,11 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingBottom: 32,
         gap: 24,
     },
     profileSection: {
         flexDirection: "row",
         alignItems: "center",
-        marginTop: 32,
     },
     profileImage: {
         width: 60,
