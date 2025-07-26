@@ -2,15 +2,16 @@ import { SafeAreaView, ScrollView, StyleSheet, Image, View, Text, Pressable } fr
 import { useState } from "react";
 import ProfileIcon from "src/assets/images/profileIcon.png";
 import Header from "src/components/common/header";
+import Post from "src/components/profile/post";
+import Stat from "src/components/profile/stat";
 
-const ProfileScreen = () => {
+const Profile = () => {
     const [activeTab, setActiveTab] = useState<"post" | "stat">("post");
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Header title="프로필" />
-
                 <View style={styles.profileSection}>
                     <Image source={ProfileIcon} style={styles.profileImage} resizeMode="cover" />
                     <View style={styles.info}>
@@ -35,12 +36,14 @@ const ProfileScreen = () => {
                         );
                     })}
                 </View>
+
+                {activeTab === "post" ? <Post /> : <Stat />}
             </ScrollView>
         </SafeAreaView>
     );
 };
 
-export default ProfileScreen;
+export default Profile;
 
 const styles = StyleSheet.create({
     container: {

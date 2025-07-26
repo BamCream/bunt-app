@@ -1,11 +1,11 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import Logo from "../../assets/images/logo.png";
-const Header = (title?: String) => {
+const Header = ({ title }: { title?: string }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View>
                 {title ? (
-                    <Text style={styles.title}>title</Text>
+                    <Text style={styles.title}>{title}</Text>
                 ) : (
                     <Logo
                         source={Logo}
