@@ -2,8 +2,6 @@ import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
 import Header from "src/components/common/header";
 import CodeInputModal from "src/components/common/modal/modal";
 
-import React, { useState } from "react";
-
 const DictionaryScreen = () => {
     const handleSubmitCode = (code: string) => {
         console.log("입력한 코드:", code);

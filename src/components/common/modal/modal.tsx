@@ -39,7 +39,10 @@ const CodeInputModal = ({ onSubmit }: CodeInputModalProps) => {
                             <View style={styles.buttonGroup}>
                                 <TouchableOpacity
                                     style={[styles.button, styles.cancelButton]}
-                                    onPress={() => setModalOpen(false)}
+                                    onPress={() => {
+                                        setModalOpen(false);
+                                        setCode("");
+                                    }}
                                 >
                                     <Text
                                         style={[
