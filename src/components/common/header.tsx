@@ -7,7 +7,8 @@ import {
     Image,
     TouchableOpacity,
 } from "react-native";
-import Logo from "../../assets/images/logo.png";
+import { useRouter } from "expo-router";
+import Logo from "src/assets/images/logo.png";
 import { useIsModalOpenStore } from "src/store/isModalOpenStore";
 
 interface HeaderProps {
@@ -16,6 +17,12 @@ interface HeaderProps {
 
 const Header = ({ title }: HeaderProps) => {
     const { setModalOpen } = useIsModalOpenStore();
+    const router = useRouter();
+
+    const handleRecordRegister = () => {
+        router.push('/camera');
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.wrapper}>
@@ -30,7 +37,10 @@ const Header = ({ title }: HeaderProps) => {
                                 <Text style={styles.buttonText}>도감 등록</Text>
                             </TouchableOpacity>
                         ) : title === "기록" ? (
-                            <TouchableOpacity style={styles.button}>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={handleRecordRegister}
+                            >
                                 <Text style={styles.buttonText}>기록 등록</Text>
                             </TouchableOpacity>
                         ) : null}
@@ -65,10 +75,9 @@ const styles = StyleSheet.create({
     wrapper: {
         width: "100%",
         flexDirection: "row",
-        paddingVertical: 10,
+        paddingVertical: 12,
         justifyContent: "space-between",
         alignItems: "center",
-        paddingVertical: 12,
     },
     button: {
         backgroundColor: "#222",

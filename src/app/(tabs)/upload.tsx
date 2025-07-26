@@ -11,46 +11,95 @@ import {
     Dimensions,
     Alert,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import Header from "src/components/common/header";
+import usePost from "src/hooks/post/usePost";
+import { uploadApi } from "src/apis/upload/upload.api";
 
 const { width } = Dimensions.get("window");
 
-// 이미지 타입 정의
 interface UploadedImage {
     id: number;
     uri: string;
 }
 
 const UploadScreen = () => {
-    const [title, setTitle] = useState<string>("");
-    const [description, setDescription] = useState<string>("");
-    const [tags, setTags] = useState<string>("");
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [tags, setTags] = useState("");
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+    const { createPost } = usePost();
 
-    // 이미지 선택 함수 (실제 구현시 react-native-image-picker 등 사용)
-    const handleImageUpload = () => {
-        // 임시로 더미 이미지 추가
-        const newImage: UploadedImage = {
-            id: Date.now(),
-            uri: `https://picsum.photos/200/200?random=${Date.now()}`,
-        };
-        setUploadedImages([...uploadedImages, newImage]);
+    const handleImageUpload = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 0.8,
+        });
+
+        if (!result.canceled && result.assets.length > 0) {
+            const image = result.assets[0];
+            console.log("선택한 이미지 URI:", image.uri);
+
+            try {
+                const imageUrl = await uploadApi(image.uri);
+                console.log("서버에서 반환된 이미지 URL:", imageUrl);
+
+                setUploadedImages([{ id: Date.now(), uri: imageUrl }]);
+            } catch (error) {
+                console.error("이미지 업로드 실패:", error);
+                Alert.alert("이미지 업로드 실패", "이미지 업로드 중 문제가 발생했습니다.");
+            }
+        } else {
+            console.log("이미지 선택이 취소되었거나 유효하지 않음");
+        }
     };
 
-    // 이미지 삭제 함수
+    const handleSubmit = async () => {
+        if (!title || !description || uploadedImages.length === 0) {
+            Alert.alert("입력 오류", "제목, 설명, 이미지를 모두 입력해주세요.");
+            return;
+        }
+
+        try {
+            const tagList = tags
+                .split(",")
+                .map(tag => tag.trim())
+                .filter(Boolean)
+                .map(name => ({ name }));
+
+            console.log("게시글 데이터:", {
+                title,
+                content: description,
+                imageUrl: uploadedImages[0].uri,
+                tags: tagList,
+            });
+
+            await createPost({
+                title,
+                content: description,
+                imageUrl: uploadedImages[0].uri,
+                tags: tagList,
+            });
+
+            Alert.alert("성공", "게시글이 등록되었습니다.");
+            setTitle("");
+            setDescription("");
+            setTags("");
+            setUploadedImages([]);
+        } catch (err) {
+            console.error("게시글 등록 실패:", err);
+        }
+    };
+
     const handleImageRemove = (imageId: number) => {
         setUploadedImages(uploadedImages.filter((img) => img.id !== imageId));
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView
-                style={styles.mainWrapper}
-                showsVerticalScrollIndicator={false}
-            >
+            <ScrollView style={styles.mainWrapper} showsVerticalScrollIndicator={false}>
                 <Header title="게시물 업로드" />
 
-                {/* 제목 입력 */}
                 <View style={styles.inputSection}>
                     <Text style={styles.label}>제목</Text>
                     <TextInput
@@ -62,7 +111,6 @@ const UploadScreen = () => {
                     />
                 </View>
 
-                {/* 설명 입력 */}
                 <View style={styles.inputSection}>
                     <Text style={styles.label}>설명</Text>
                     <TextInput
@@ -70,76 +118,59 @@ const UploadScreen = () => {
                         placeholder="설명을 입력해주세요"
                         value={description}
                         onChangeText={setDescription}
-                        multiline={true}
+                        multiline
                         numberOfLines={4}
                         textAlignVertical="top"
                         placeholderTextColor="#999"
                     />
                 </View>
 
-                {/* 태그 입력 */}
                 <View style={styles.inputSection}>
                     <Text style={styles.label}>태그</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="태그를 입력해주세요"
+                        placeholder="예: 여행,맛집,풍경"
                         value={tags}
                         onChangeText={setTags}
                         placeholderTextColor="#999"
                     />
                 </View>
 
-                {/* 업로드 영역 */}
-                <TouchableOpacity
-                    style={styles.uploadArea}
-                    onPress={handleImageUpload}
-                    activeOpacity={0.7}
-                >
+                <TouchableOpacity style={styles.uploadArea} onPress={handleImageUpload}>
                     <View style={styles.uploadButton}>
-                        <Text style={styles.uploadButtonText}>업로드</Text>
+                        <Text style={styles.uploadButtonText}>이미지 선택</Text>
                     </View>
                 </TouchableOpacity>
 
-                {/* 업로드된 이미지들 */}
                 {uploadedImages.length > 0 && (
                     <View style={styles.imageSection}>
                         <View style={styles.imageGrid}>
-                            {uploadedImages.map((image, index) => (
+                            {uploadedImages.map((image) => (
                                 <TouchableOpacity
                                     key={image.id}
                                     style={styles.imageContainer}
                                     onLongPress={() => {
-                                        Alert.alert(
-                                            "이미지 삭제",
-                                            "이 이미지를 삭제하시겠습니까?",
-                                            [
-                                                {
-                                                    text: "취소",
-                                                    style: "cancel",
-                                                },
-                                                {
-                                                    text: "삭제",
-                                                    onPress: () =>
-                                                        handleImageRemove(
-                                                            image.id
-                                                        ),
-                                                    style: "destructive",
-                                                },
-                                            ]
-                                        );
+                                        Alert.alert("이미지 삭제", "이 이미지를 삭제하시겠습니까?", [
+                                            { text: "취소", style: "cancel" },
+                                            {
+                                                text: "삭제",
+                                                onPress: () => handleImageRemove(image.id),
+                                                style: "destructive",
+                                            },
+                                        ]);
                                     }}
                                 >
-                                    <Image
-                                        source={{ uri: image.uri }}
-                                        style={styles.uploadedImage}
-                                    />
+                                    <Image source={{ uri: image.uri }} style={styles.uploadedImage} />
                                 </TouchableOpacity>
                             ))}
                         </View>
                     </View>
                 )}
 
-                {/* 하단 여백 */}
+                <TouchableOpacity style={styles.uploadButton} onPress={handleSubmit}>
+                    <Text style={styles.uploadButtonText}>게시물 등록</Text>
+                </TouchableOpacity>
+
                 <View style={styles.bottomSpacing} />
             </ScrollView>
         </SafeAreaView>
@@ -194,6 +225,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fafafa",
     },
     uploadButton: {
+        alignSelf: "center",
         paddingHorizontal: 24,
         paddingVertical: 12,
         backgroundColor: "#007AFF",
@@ -213,7 +245,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     imageContainer: {
-        width: (width - 80) / 3, // 3개씩 배치, 여백 고려
+        width: (width - 80) / 3,
         height: (width - 80) / 3,
         marginBottom: 10,
         borderRadius: 8,
