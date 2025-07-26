@@ -2,15 +2,12 @@ import { useCallback } from "react";
 import { Alert } from "react-native";
 import BuntAxios from "src/libs/axios";
 
-interface Tag {
-    name: string;
-}
 
 interface CreatePostPayload {
     title: string;
     content: string;
     imageUrl: string;
-    tags: Tag[];
+    tags: string[];
 }
 
 const usePost = () => {

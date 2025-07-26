@@ -18,16 +18,11 @@ import { uploadApi } from "src/apis/upload/upload.api";
 
 const { width } = Dimensions.get("window");
 
-interface UploadedImage {
-    id: number;
-    uri: string;
-}
-
 const UploadScreen = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [tags, setTags] = useState("");
-    const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
     const { createPost } = usePost();
 
     const handleImageUpload = async () => {
@@ -38,46 +33,32 @@ const UploadScreen = () => {
 
         if (!result.canceled && result.assets.length > 0) {
             const image = result.assets[0];
-            console.log("선택한 이미지 URI:", image.uri);
-
             try {
-                const imageUrl = await uploadApi(image.uri);
-                console.log("서버에서 반환된 이미지 URL:", imageUrl);
-
-                setUploadedImages([{ id: Date.now(), uri: imageUrl }]);
+                const uploaded = await uploadApi(image.uri);
+                setImageUrl(uploaded);
             } catch (error) {
                 console.error("이미지 업로드 실패:", error);
-                Alert.alert("이미지 업로드 실패", "이미지 업로드 중 문제가 발생했습니다.");
+                Alert.alert("이미지 업로드 실패", "업로드 중 오류가 발생했습니다.");
             }
-        } else {
-            console.log("이미지 선택이 취소되었거나 유효하지 않음");
         }
     };
 
     const handleSubmit = async () => {
-        if (!title || !description || uploadedImages.length === 0) {
+        if (!title || !description || !imageUrl) {
             Alert.alert("입력 오류", "제목, 설명, 이미지를 모두 입력해주세요.");
             return;
         }
 
+        const tagList = tags
+            .split(",")
+            .map(tag => tag.trim())
+            .filter(Boolean);
+
         try {
-            const tagList = tags
-                .split(",")
-                .map(tag => tag.trim())
-                .filter(Boolean)
-                .map(name => ({ name }));
-
-            console.log("게시글 데이터:", {
-                title,
-                content: description,
-                imageUrl: uploadedImages[0].uri,
-                tags: tagList,
-            });
-
             await createPost({
                 title,
                 content: description,
-                imageUrl: uploadedImages[0].uri,
+                imageUrl,
                 tags: tagList,
             });
 
@@ -85,14 +66,12 @@ const UploadScreen = () => {
             setTitle("");
             setDescription("");
             setTags("");
-            setUploadedImages([]);
+            setImageUrl(null);
         } catch (err) {
             console.error("게시글 등록 실패:", err);
         }
-    };
 
-    const handleImageRemove = (imageId: number) => {
-        setUploadedImages(uploadedImages.filter((img) => img.id !== imageId));
+        console.log({ title, description, imageUrl, tags: tagList });
     };
 
     return (
@@ -129,7 +108,7 @@ const UploadScreen = () => {
                     <Text style={styles.label}>태그</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="예: 여행,맛집,풍경"
+                        placeholder="ex) 최강 포수"
                         value={tags}
                         onChangeText={setTags}
                         placeholderTextColor="#999"
@@ -142,29 +121,22 @@ const UploadScreen = () => {
                     </View>
                 </TouchableOpacity>
 
-                {uploadedImages.length > 0 && (
-                    <View style={styles.imageSection}>
-                        <View style={styles.imageGrid}>
-                            {uploadedImages.map((image) => (
-                                <TouchableOpacity
-                                    key={image.id}
-                                    style={styles.imageContainer}
-                                    onLongPress={() => {
-                                        Alert.alert("이미지 삭제", "이 이미지를 삭제하시겠습니까?", [
-                                            { text: "취소", style: "cancel" },
-                                            {
-                                                text: "삭제",
-                                                onPress: () => handleImageRemove(image.id),
-                                                style: "destructive",
-                                            },
-                                        ]);
-                                    }}
-                                >
-                                    <Image source={{ uri: image.uri }} style={styles.uploadedImage} />
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    </View>
+                {imageUrl && (
+                    <TouchableOpacity
+                        style={styles.imageContainer}
+                        onLongPress={() =>
+                            Alert.alert("이미지 삭제", "이 이미지를 삭제하시겠습니까?", [
+                                { text: "취소", style: "cancel" },
+                                {
+                                    text: "삭제",
+                                    style: "destructive",
+                                    onPress: () => setImageUrl(null),
+                                },
+                            ])
+                        }
+                    >
+                        <Image source={{ uri: imageUrl }} style={styles.uploadedImage} />
+                    </TouchableOpacity>
                 )}
 
                 <TouchableOpacity style={styles.uploadButton} onPress={handleSubmit}>
@@ -177,14 +149,14 @@ const UploadScreen = () => {
     );
 };
 
+export default UploadScreen;
+
 const styles = StyleSheet.create({
     container: {
-        width: "100%",
         flex: 1,
         backgroundColor: "#fff",
     },
     mainWrapper: {
-        width: "100%",
         paddingHorizontal: 30,
     },
     inputSection: {
@@ -200,7 +172,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: "#ddd",
         paddingVertical: 12,
-        paddingHorizontal: 0,
         fontSize: 16,
         color: "#333",
     },
@@ -236,18 +207,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
     },
-    imageSection: {
-        marginTop: 20,
-    },
-    imageGrid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-    },
     imageContainer: {
-        width: (width - 80) / 3,
-        height: (width - 80) / 3,
-        marginBottom: 10,
+        width: (width - 80) / 2,
+        height: (width - 80) / 2,
+        alignSelf: "center",
+        marginBottom: 20,
         borderRadius: 8,
         overflow: "hidden",
         borderWidth: 1,
@@ -262,5 +226,3 @@ const styles = StyleSheet.create({
         height: 50,
     },
 });
-
-export default UploadScreen;
