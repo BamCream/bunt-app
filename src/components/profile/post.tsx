@@ -3,9 +3,18 @@ import { View, StyleSheet } from "react-native";
 const Post = () => {
     return (
         <View style={styles.container}>
-            {Array.from({ length: 12 }).map((_, index) => (
-                <View key={index} style={styles.box} />
-            ))}
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
+            <View style={styles.box} />
         </View>
     );
 };
@@ -17,13 +26,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        paddingHorizontal: 2,
-        rowGap: 2,
+        padding: 2,
     },
     box: {
-        width: "32.66%",
-        aspectRatio: 1,
-        backgroundColor: "#d9d9d9",
+        width: "100%",
+        height: 30,
+        backgroundColor: "#ccc",
+        marginBottom: 2,
         borderRadius: 4,
     },
 });

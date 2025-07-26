@@ -18,7 +18,7 @@ const Profile = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView contentContainerStyle={[styles.scrollContent, {flexGrow: 1}]}>
                 <Header title="프로필" />
                 <View style={styles.profileSection}>
                     <Image
