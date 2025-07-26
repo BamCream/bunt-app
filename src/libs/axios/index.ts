@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { requestInterceptor } from "./requestInterceptor";
 import { responseErrorInterceptor } from "./responseErrorInterceptor";
-import { REQUEST_TOKEN } from "src/constants/token/token";
-import {Token} from "src/libs/token";
+import { REQUEST_TOKEN, ACCESS_TOKEN } from "src/constants/token/token";
+import Token from "src/libs/token";
 
 const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL;
 
@@ -23,7 +23,7 @@ const createCustomAxiosInstance = (baseURL?: AxiosRequestConfig) => {
 export const BuntAxios = createCustomAxiosInstance({
     baseURL: SERVER_URL,
     headers: {
-        [REQUEST_TOKEN]: `Bearer ${Token.get.access()}`!,
+        [REQUEST_TOKEN]: `Bearer ${Token.getToken(ACCESS_TOKEN)}`!,
     },
 });
 

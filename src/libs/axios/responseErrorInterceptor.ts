@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import Token from "src/libs/token";
 import { ACCESS_TOKEN, REFRESH_TOKEN, REQUEST_TOKEN } from "src/constants/token/token";
-import { refresh } from "src/apis/auth/auth.api";
+import { refresh } from "src/apis/login/login.api";
 import { router } from "expo-router";
 import { errorHandler } from "./errorHandler";
 
@@ -28,7 +28,7 @@ export const responseErrorInterceptor = async (error: AxiosError) => {
                     await Token.setToken(ACCESS_TOKEN, data.accessToken);
                     onRefreshed(data.accessToken);
                 } catch {
-                    await Token.removeToken();
+                    await Token.clearToken();
                     router.replace("/auth/login");
                 } finally {
                     isRefreshing = false;
