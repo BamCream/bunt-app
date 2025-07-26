@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, View, ScrollView } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import {
+    SafeAreaView,
+    StyleSheet,
+    View,
+    ScrollView,
+    RefreshControl,
+} from "react-native";
 import Header from "src/components/common/header";
 import { PostProps } from "src/components/common/post/type";
 import Post from "src/components/common/post/post";
@@ -7,22 +13,38 @@ import BuntAxios from "src/libs/axios";
 
 const HomeScreen = () => {
     const [posts, setPosts] = useState<PostProps[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
 
-    const post = async () => {
+    const fetchPosts = async () => {
         try {
             const res = await BuntAxios("/posts");
             setPosts(res.data);
         } catch (error) {
-            throw error;
+            console.error(error);
         }
     };
 
-    useEffect(() => {
-        post();
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await fetchPosts();
+        setRefreshing(false);
     }, []);
+
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView style={styles.mainWrapper}>
+            <ScrollView
+                style={styles.mainWrapper}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            >
                 <Header />
                 {posts.map((post, index) => (
                     <Post key={index} {...post} />

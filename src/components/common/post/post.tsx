@@ -22,13 +22,14 @@ const Post = ({ ...post }: PostProps) => {
                     <Text style={styles.description}>{post.content} </Text>
                     {post.tags.map((item, index) => (
                         <Text key={index} style={styles.tags}>
-                            # {item[index]}{" "}
+                            # {item}{" "}
                         </Text>
                     ))}
                 </View>
-                <View style={{ height: 16 }} />
+                <View style={{ height: 8 }} />
                 <Text style={styles.date}>{post.createdAt.slice(0, 10)}</Text>
             </View>
+            <View style={{ height: 20 }} />
         </View>
     );
 };

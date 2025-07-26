@@ -26,6 +26,7 @@ const TabLayout = () => {
             <Tabs.Screen
                 name="home"
                 options={{
+                    unmountOnBlur: true,
                     tabBarIcon: ({ color }) => (
                         <Image
                             source={Home}
@@ -38,6 +39,7 @@ const TabLayout = () => {
             <Tabs.Screen
                 name="dictionary"
                 options={{
+                    unmountOnBlur: true,
                     tabBarIcon: ({ color }) => (
                         <Image
                             source={Dictionary}
@@ -50,6 +52,7 @@ const TabLayout = () => {
             <Tabs.Screen
                 name="upload"
                 options={{
+                    unmountOnBlur: true,
                     tabBarIcon: ({ color }) => (
                         <Image
                             source={Upload}
@@ -62,6 +65,7 @@ const TabLayout = () => {
             <Tabs.Screen
                 name="record"
                 options={{
+                    unmountOnBlur: true,
                     tabBarIcon: ({ color }) => (
                         <Image
                             source={Record}
@@ -74,6 +78,7 @@ const TabLayout = () => {
             <Tabs.Screen
                 name="profile"
                 options={{
+                    unmountOnBlur: true,
                     tabBarIcon: ({ color }) => (
                         <Image
                             source={Profile}
