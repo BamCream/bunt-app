@@ -1,9 +1,10 @@
 export type PostProps = {
-    profileImg: string;
-    profileName: string;
-    post: string;
-    description: string;
+    id: number;
     title: string;
-    tags: Array<string>;
-    date: string;
+    content: string;
+    imageUrl: string;
+    authorId: number;
+    tags: string[];
+    createdAt: string;
+    updatedAt: string;
 };

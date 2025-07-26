@@ -8,23 +8,29 @@ import {
     Image,
     FlatList,
 } from "react-native";
-import { useState } from "react";
+import Lock from "../../assets/images/lock.png";
+import Unlock from "../../assets/images/unlock.png";
+import { useEffect, useState } from "react";
 import Header from "src/components/common/header";
 import CodeInputModal from "src/components/common/modal/modal";
-import { TEAMS } from "src/constants/teams";
-
-const CATEGORIES = ["모자", "유니폼", "기타"];
-
-const DUMMY_ITEMS = Array.from({ length: 6 }, (_, i) => ({
-    id: i.toString(),
-    title: "Men's Los Angeles",
-    image: require("src/assets/images/profileIcon.png"),
-}));
+import { DicProps } from "src/types/DicType";
+import BuntAxios from "src/libs/axios";
 
 const DictionaryScreen = () => {
-    const [selectedCategory, setSelectedCategory] = useState("모자");
-    const [selectedTeam, setSelectedTeam] = useState("삼성 라이온즈");
-    const [teamDropdownVisible, setTeamDropdownVisible] = useState(false);
+    const post = async () => {
+        try {
+            const res = await BuntAxios("/dict");
+            setItems(res.data);
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    useEffect(() => {
+        post();
+    }, []);
+
+    const [items, setItems] = useState<DicProps[]>([]);
 
     const handleSubmitCode = (code: string) => {
         console.log("입력한 코드:", code);
@@ -36,89 +42,67 @@ const DictionaryScreen = () => {
                 <Header title="도감" />
                 <View style={styles.section}>
                     <View style={styles.filterRow}>
-                        <View style={styles.categoryButtons}>
-                            {CATEGORIES.map((cat) => {
-                                const active = cat === selectedCategory;
-                                return (
-                                    <Pressable
-                                        key={cat}
-                                        onPress={() => setSelectedCategory(cat)}
-                                        style={[
-                                            styles.filterButton,
-                                            active
-                                                ? styles.activeFilter
-                                                : styles.inactiveFilter,
-                                        ]}
-                                    >
-                                        <Text
-                                            style={
-                                                active
-                                                    ? styles.activeFilterText
-                                                    : styles.inactiveFilterText
-                                            }
-                                        >
-                                            {cat}
-                                        </Text>
-                                    </Pressable>
-                                );
-                            })}
-                        </View>
-
-                        <View style={{ position: "relative" }}>
-                            <Pressable
-                                onPress={() =>
-                                    setTeamDropdownVisible(!teamDropdownVisible)
-                                }
-                            >
-                                <Text style={styles.dropdown}>
-                                    {selectedTeam} ⌄
-                                </Text>
-                            </Pressable>
-
-                            {teamDropdownVisible && (
-                                <View style={styles.dropdownBox}>
-                                    {TEAMS.map((team) => (
-                                        <Pressable
-                                            key={team}
-                                            onPress={() => {
-                                                setSelectedTeam(team);
-                                                setTeamDropdownVisible(false);
-                                            }}
-                                            style={styles.dropdownItem}
-                                        >
-                                            <Text
-                                                style={styles.dropdownItemText}
-                                            >
-                                                {team}
-                                            </Text>
-                                        </Pressable>
-                                    ))}
-                                </View>
-                            )}
-                        </View>
+                        <View style={styles.categoryButtons}></View>
                     </View>
 
                     <FlatList
-                        data={DUMMY_ITEMS}
-                        keyExtractor={(item) => item.id}
+                        data={items}
+                        keyExtractor={(item) => item.id.toString()}
                         numColumns={3}
                         columnWrapperStyle={styles.gridRow}
                         renderItem={({ item }) => (
                             <View style={styles.card}>
-                                <Image
-                                    source={item.image}
-                                    style={styles.cardImage}
-                                />
+                                <View style={styles.imageWrapper}>
+                                    <Image
+                                        source={{ uri: item.productImage }}
+                                        style={styles.cardImage}
+                                    />
+                                    {item.isUnlocked === "LOCKED" && (
+                                        <View style={styles.overlay} />
+                                    )}
+                                </View>
                                 <Text style={styles.cardTitle}>
-                                    {item.title}
+                                    {item.productName}
                                 </Text>
+
+                                <View style={{ height: 16 }} />
+
+                                {/* 자물쇠 아이콘 */}
+                                {item.isUnlocked === "LOCKED" && (
+                                    <View
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            gap: 4,
+                                        }}
+                                    >
+                                        <Image
+                                            source={Lock}
+                                            style={styles.icon}
+                                        />
+                                        <Text style={styles.statusText}>
+                                            아직 획득하지 못했습니다
+                                        </Text>
+                                    </View>
+                                )}
+                                {item.isUnlocked === "UNLOCKED" && (
+                                    <>
+                                        <Image
+                                            source={Unlock}
+                                            style={styles.icon}
+                                        />
+                                        <Text style={styles.statusText}>
+                                            획득하였습니다
+                                        </Text>
+                                    </>
+                                )}
                             </View>
                         )}
                         scrollEnabled={false}
                     />
                 </View>
             </ScrollView>
-
             <CodeInputModal onSubmit={handleSubmitCode} />
         </SafeAreaView>
     );
@@ -203,6 +187,18 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "#000",
     },
+    icon: {
+        width: 10,
+        height: 13,
+        alignSelf: "center",
+        marginBottom: 4,
+    },
+    statusText: {
+        fontSize: 8,
+        textAlign: "center",
+        color: "#555",
+    },
+
     gridRow: {
         justifyContent: "space-between",
         marginTop: 12,
@@ -217,6 +213,23 @@ const styles = StyleSheet.create({
         backgroundColor: "#ccc",
         borderRadius: 8,
     },
+    imageWrapper: {
+        position: "relative",
+        width: "100%",
+        aspectRatio: 1,
+    },
+
+    overlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 100,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
+    },
+
     cardTitle: {
         marginTop: 8,
         fontSize: 12,
